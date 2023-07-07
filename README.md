@@ -21,3 +21,6 @@ To send a prompt to DALL-E you need to supply a prompt/description.
 ```
 openclai -dalle -prompt "A white cat with blue eyes."
 ```
+
+## Licence
+This project uses the [GPL-3.0 Licence](https://choosealicense.com/licenses/gpl-3.0/).

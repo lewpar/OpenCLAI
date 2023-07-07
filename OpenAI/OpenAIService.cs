@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using OpenCLAI.OpenAI.ChatGPT;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -14,11 +15,11 @@ namespace OpenCLAI.OpenAI
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
         }
 
-        public async Task<OpenAIResult> SendPromptAsync(string prompt, List<OpenAI.ChatGPT.Message> history)
+        public async Task<ChatGPTResult> SendPromptAsync(string prompt, List<OpenAI.ChatGPT.Message> history)
         {
             if (string.IsNullOrEmpty(prompt))
             {
-                return new OpenAIResult(OpenAIResultStatus.Failure, "Message was null.");
+                return new ChatGPTResult(OpenAIResultStatus.Failure, "Message was null.");
             }
 
             var gptRequest = new OpenAI.ChatGPT.Request()
@@ -46,7 +47,7 @@ namespace OpenCLAI.OpenAI
 
             if (!response.IsSuccessStatusCode)
             {
-                return new OpenAIResult(OpenAIResultStatus.Failure, $"There was an issue with the response. Status: {response.StatusCode}");
+                return new ChatGPTResult(OpenAIResultStatus.Failure, $"There was an issue with the response. Status: {response.StatusCode}");
             }
 
             var content = await response.Content.ReadAsStringAsync();
@@ -54,27 +55,27 @@ namespace OpenCLAI.OpenAI
 
             if (gptResponse == null)
             {
-                return new OpenAIResult(OpenAIResultStatus.Failure, "There was an issue with the web request.");
+                return new ChatGPTResult(OpenAIResultStatus.Failure, "There was an issue with the web request.");
             }
 
             if (gptResponse.Choices == null || gptResponse.Choices[0] == null)
             {
-                return new OpenAIResult(OpenAIResultStatus.Failure, "Failed to get GPT response choices.");
+                return new ChatGPTResult(OpenAIResultStatus.Failure, "Failed to get GPT response choices.");
             }
 
             if (gptResponse.Choices[0].Message == null)
             {
-                return new OpenAIResult(OpenAIResultStatus.Failure, "GPT response Message was null.");
+                return new ChatGPTResult(OpenAIResultStatus.Failure, "GPT response Message was null.");
             }
 
             if (string.IsNullOrEmpty(gptResponse.Choices[0]?.Message?.Content))
             {
-                return new OpenAIResult(OpenAIResultStatus.Failure, "GPT response Message content was null.");
+                return new ChatGPTResult(OpenAIResultStatus.Failure, "GPT response Message content was null.");
             }
 
             var resultMessage = gptResponse.Choices[0].Message!.Content!;
 
-            return new OpenAIResult(OpenAIResultStatus.Success, gptResponse.Choices[0].Message!.Content!, gptResponse);
+            return new ChatGPTResult(OpenAIResultStatus.Success, gptResponse.Choices[0].Message!.Content!, gptResponse);
         }
     }
 }

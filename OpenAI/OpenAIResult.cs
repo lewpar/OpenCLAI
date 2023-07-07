@@ -11,7 +11,7 @@
         public OpenAIResultStatus Status { get; set; }
         public string Message { get; set; }
 
-        public OpenAIResult(OpenAIResultStatus status, string message, ChatGPT.Response? response = null)
+        public OpenAIResult(OpenAIResultStatus status, string message)
         {
             Status = status;
             Message = message;

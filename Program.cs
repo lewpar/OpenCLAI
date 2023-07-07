@@ -98,6 +98,7 @@ namespace OpenCLAI
                 return;
             }
 
+            Console.WriteLine("Fetching response..");
             var result = await openAIService.SendPromptAsync(prompt.Value, new List<OpenAI.ChatGPT.Message>());
 
             if(result is null)

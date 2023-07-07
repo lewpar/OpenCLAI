@@ -53,8 +53,8 @@ namespace OpenCLAI
 
             openAIService = new OpenAIService(config.Config.OpenAIKey);
 
-            string? option = null;
-            if(!TryGetOption(args, out option))
+            string? option;
+            if (!TryGetOption(args, out option))
             {
                 Console.WriteLine("You must supply an OpenAI option as a parameter. Type 'openclai --options' to view them all.");
                 Console.WriteLine("Example: openclai -chatgpt -prompt \"How many planets are in our solar system?\"");
@@ -77,8 +77,8 @@ namespace OpenCLAI
 
         static async Task HandleChatGPT(string[] args)
         {
-            Argument? prompt = null;
-            if(!ArgumentParser.TryFind(args, "-prompt", out prompt) && 
+            Argument? prompt;
+            if (!ArgumentParser.TryFind(args, "-prompt", out prompt) && 
                 !ArgumentParser.TryFind(args, "-p", out prompt))
             {
                 Console.WriteLine("Prompt expected when using ChatGPT option.");
@@ -119,7 +119,7 @@ namespace OpenCLAI
 
         static async Task HandleDALLE(string[] args)
         {
-            Argument? prompt = null;
+            Argument? prompt;
             if (!ArgumentParser.TryFind(args, "-prompt", out prompt) &&
                 !ArgumentParser.TryFind(args, "-p", out prompt))
             {

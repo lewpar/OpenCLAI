@@ -42,8 +42,10 @@ namespace OpenCLAI.OpenAI
 
             var gptJson = JsonSerializer.Serialize(gptRequest);
 
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions");
-            request.Content = new StringContent(gptJson, Encoding.UTF8, "application/json");
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions")
+            {
+                Content = new StringContent(gptJson, Encoding.UTF8, "application/json")
+            };
 
             var response = await _httpClient.SendAsync(request);
 
@@ -75,8 +77,6 @@ namespace OpenCLAI.OpenAI
                 return new ChatGPTResult(OpenAIResultStatus.Failure, "GPT response Message content was null.");
             }
 
-            var resultMessage = gptResponse.Choices[0].Message!.Content!;
-
             return new ChatGPTResult(OpenAIResultStatus.Success, gptResponse.Choices[0].Message!.Content!, gptResponse);
         }
 
@@ -92,8 +92,10 @@ namespace OpenCLAI.OpenAI
 
             var json = JsonSerializer.Serialize(request);
 
-            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/images/generations");
-            httpRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/images/generations")
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            };
 
             var response = await _httpClient.SendAsync(httpRequest);
 
@@ -114,7 +116,7 @@ namespace OpenCLAI.OpenAI
             foreach (var image in imageResponse.Data)
             {
                 sb.Append(image.Url);
-                sb.Append(";");
+                sb.Append(';');
             }
 
             return new DALLEResult(OpenAIResultStatus.Success, sb.ToString(), imageResponse);

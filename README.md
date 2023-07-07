@@ -1,6 +1,9 @@
 # OpenCLAI
 Brings the power of OpenAI to your terminal.
 
+## Note
+To use this tool anywhere from the command-line you need to add the openclai bin to your system path.
+
 ## Usage
 To use any of the OpenAI endpoints you must select a OpenAI option.
 

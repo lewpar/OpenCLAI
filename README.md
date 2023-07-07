@@ -18,6 +18,10 @@ To send a prompt to ChatGPT you need to supply a prompt.
 ```
 openclai -chatgpt -prompt "How many planets are in our solar system?"
 ```
+You can also use the bash script provided.
+```
+chatgpt How many planets are in our solar system?
+```
 
 ### DALL-E
 To send a prompt to DALL-E you need to supply a prompt/description.

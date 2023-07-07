@@ -1,9 +1,6 @@
 ﻿using OpenCLAI.CommandLine;
 using OpenCLAI.Configuration;
 using OpenCLAI.Models;
-using System.Net.Http.Headers;
-using System.Net.Http;
-using System.Security.Cryptography;
 using OpenCLAI.OpenAI;
 
 namespace OpenCLAI

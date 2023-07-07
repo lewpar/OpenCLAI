@@ -2,6 +2,7 @@
 using OpenCLAI.Configuration;
 using OpenCLAI.Models;
 using OpenCLAI.OpenAI;
+using OpenCLAI.Utilities;
 
 namespace OpenCLAI
 {
@@ -156,7 +157,7 @@ namespace OpenCLAI
                 return;
             }
 
-            Console.WriteLine(result.Message);
+            ConsoleHelper.WriteLine(result.Message, ConsoleColor.Green);
         }
     }
 }

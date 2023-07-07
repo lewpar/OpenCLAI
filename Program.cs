@@ -19,7 +19,7 @@ namespace OpenCLAI
         {
             foreach(var aiOption in aiOptions)
             {
-                if(ArgumentParser.TryFind(args, $"-{aiOption.Key}", out var argument))
+                if(ArgumentParser.TryFind(args, $"-{aiOption.Key}", out var argument, false))
                 {
                     // Remove the leading dash.
                     option = argument.Name?.Substring(1);
@@ -32,6 +32,16 @@ namespace OpenCLAI
         }
         static async Task Main(string[] args)
         {
+            if (ArgumentParser.TryFind(args, "--options", out _, false))
+            {
+                Console.WriteLine("Options:");
+                foreach (var aiOption in aiOptions)
+                {
+                    Console.WriteLine($"-{aiOption.Key}");
+                }
+                return;
+            }
+
             var config = await Config.TryLoadConfigAsync();
             if (config.Result == Result.Failed)
             {

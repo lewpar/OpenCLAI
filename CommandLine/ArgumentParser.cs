@@ -2,7 +2,7 @@
 {
     public class ArgumentParser
     {
-        public static bool TryFind(string[] args, string name, out Argument argument)
+        public static bool TryFind(string[] args, string name, out Argument argument, bool valueExpected = true)
         {
             argument = new Argument();
 
@@ -15,7 +15,11 @@
                     if (arg == name)
                     {
                         argument.Name = args[i];
-                        argument.Value = args[i + 1];
+
+                        if(valueExpected)
+                        {
+                            argument.Value = args[i + 1];
+                        }
 
                         return true;
                     }

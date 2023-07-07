@@ -1,6 +1,7 @@
 ﻿using OpenCLAI.CommandLine;
 using OpenCLAI.Configuration;
 using OpenCLAI.Models;
+using System.Security.Cryptography;
 
 namespace OpenCLAI
 {
@@ -17,7 +18,8 @@ namespace OpenCLAI
             {
                 if(ArgumentParser.TryFind(args, $"-{aiOption.Key}", out var argument))
                 {
-                    option = argument.Name;
+                    // Remove the leading dash.
+                    option = argument.Name.Substring(1);
                     return true;
                 }
             }
@@ -55,12 +57,23 @@ namespace OpenCLAI
                 return;
             }
 
-            Console.WriteLine($"Found option {option}");
+            if(option is null)
+            {
+                Console.WriteLine("An error occured while getting OpenAI option: Options was null.");
+                return;
+            }
+
+            HandleOption(args, option);
+        }
+
+        static void HandleOption(string[] args, string? option)
+        {
+            aiOptions[option!].Invoke(args);
         }
 
         static void HandleChatGPT(string[] args)
         {
-
+            Console.WriteLine("ChatGPT Called");
         }
     }
 }

@@ -19,7 +19,7 @@ namespace OpenCLAI
                 if(ArgumentParser.TryFind(args, $"-{aiOption.Key}", out var argument))
                 {
                     // Remove the leading dash.
-                    option = argument.Name.Substring(1);
+                    option = argument.Name?.Substring(1);
                     return true;
                 }
             }
@@ -73,7 +73,20 @@ namespace OpenCLAI
 
         static void HandleChatGPT(string[] args)
         {
-            Console.WriteLine("ChatGPT Called");
+            Argument? prompt = null;
+            if(!ArgumentParser.TryFind(args, "-prompt", out prompt) && 
+                !ArgumentParser.TryFind(args, "-p", out prompt))
+            {
+                Console.WriteLine("Prompt expected when using ChatGPT option.");
+                Console.WriteLine("Example: openclai -chatgpt -prompt \"What color is a banana?\"");
+                return;
+            }
+
+            if (prompt is null)
+            {
+                Console.WriteLine("An error occured while getting ChatGPT prompt: Prompt was null.");
+                return;
+            }
         }
     }
 }

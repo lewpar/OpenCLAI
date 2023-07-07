@@ -1,13 +1,17 @@
 ﻿using OpenCLAI.CommandLine;
 using OpenCLAI.Configuration;
 using OpenCLAI.Models;
+using System.Net.Http.Headers;
+using System.Net.Http;
 using System.Security.Cryptography;
+using OpenCLAI.OpenAI;
 
 namespace OpenCLAI
 {
     internal class Program
     {
-        static Dictionary<string, Action<string[]>> aiOptions = new Dictionary<string, Action<string[]>>()
+        static HttpClient _httpClient = new HttpClient();
+        static Dictionary<string, Func<string[], Task>> aiOptions = new Dictionary<string, Func<string[], Task>>()
         {
             { "chatgpt",  HandleChatGPT }
         };
@@ -49,11 +53,14 @@ namespace OpenCLAI
                 return;
             }
 
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.Config.OpenAIKey);
+
             string? option = null;
             if(!TryGetOption(args, out option))
             {
                 Console.WriteLine("You must supply an OpenAI option as a parameter. Type 'openclai --options' to view them all.");
-                Console.WriteLine("Example: openclai -chatgpt -p \"How many planets are in our solar system?\"");
+                Console.WriteLine("Example: openclai -chatgpt -prompt \"How many planets are in our solar system?\"");
                 return;
             }
 
@@ -63,15 +70,15 @@ namespace OpenCLAI
                 return;
             }
 
-            HandleOption(args, option);
+            await HandleOption(args, option);
         }
 
-        static void HandleOption(string[] args, string? option)
+        static async Task HandleOption(string[] args, string? option)
         {
-            aiOptions[option!].Invoke(args);
+            await aiOptions[option!](args);
         }
 
-        static void HandleChatGPT(string[] args)
+        static async Task HandleChatGPT(string[] args)
         {
             Argument? prompt = null;
             if(!ArgumentParser.TryFind(args, "-prompt", out prompt) && 
@@ -82,11 +89,28 @@ namespace OpenCLAI
                 return;
             }
 
-            if (prompt is null)
+            if (prompt is null || 
+                string.IsNullOrEmpty(prompt.Value))
             {
                 Console.WriteLine("An error occured while getting ChatGPT prompt: Prompt was null.");
                 return;
             }
+
+            var result = await OpenAIService.SendPromptAsync(_httpClient, prompt.Value, new List<OpenAI.ChatGPT.Message>());
+
+            if(result is null)
+            {
+                Console.WriteLine("An error occured while getting the ChatGPT result: Result was null.");
+                return;
+            }
+
+            if(result.Status == OpenAIResultStatus.Failure)
+            {
+                Console.WriteLine($"An error occured during the ChatGPT request: {result.Message}");
+                return;
+            }
+
+            Console.WriteLine(result.Message);
         }
     }
 }

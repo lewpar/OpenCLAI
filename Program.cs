@@ -10,7 +10,7 @@ namespace OpenCLAI
 {
     internal class Program
     {
-        static HttpClient _httpClient = new HttpClient();
+        static OpenAIService openAIService;
         static Dictionary<string, Func<string[], Task>> aiOptions = new Dictionary<string, Func<string[], Task>>()
         {
             { "chatgpt",  HandleChatGPT }
@@ -53,8 +53,7 @@ namespace OpenCLAI
                 return;
             }
 
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.Config.OpenAIKey);
+            openAIService = new OpenAIService(config.Config.OpenAIKey);
 
             string? option = null;
             if(!TryGetOption(args, out option))
@@ -96,7 +95,7 @@ namespace OpenCLAI
                 return;
             }
 
-            var result = await OpenAIService.SendPromptAsync(_httpClient, prompt.Value, new List<OpenAI.ChatGPT.Message>());
+            var result = await openAIService.SendPromptAsync(prompt.Value, new List<OpenAI.ChatGPT.Message>());
 
             if(result is null)
             {

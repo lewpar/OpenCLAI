@@ -1,7 +1,9 @@
-﻿using System;
+﻿using OpenCLAI.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -10,7 +12,15 @@ namespace OpenCLAI.OpenAI
 {
     public class OpenAIService
     {
-        public static async Task<OpenAIResult> SendPromptAsync(HttpClient httpClient, string prompt, List<OpenAI.ChatGPT.Message> history)
+        private HttpClient _httpClient = new HttpClient();
+
+        public OpenAIService(string key)
+        {
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        }
+
+        public async Task<OpenAIResult> SendPromptAsync(string prompt, List<OpenAI.ChatGPT.Message> history)
         {
             if (string.IsNullOrEmpty(prompt))
             {
@@ -38,7 +48,7 @@ namespace OpenCLAI.OpenAI
             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions");
             request.Content = new StringContent(gptJson, Encoding.UTF8, "application/json");
 
-            var response = await httpClient.SendAsync(request);
+            var response = await _httpClient.SendAsync(request);
 
             if (!response.IsSuccessStatusCode)
             {

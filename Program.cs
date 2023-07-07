@@ -7,7 +7,7 @@ namespace OpenCLAI
 {
     internal class Program
     {
-        static OpenAIService openAIService;
+        static OpenAIService? openAIService;
         static Dictionary<string, Func<string[], Task>> aiOptions = new Dictionary<string, Func<string[], Task>>()
         {
             { "chatgpt",  HandleChatGPT }
@@ -89,6 +89,12 @@ namespace OpenCLAI
                 string.IsNullOrEmpty(prompt.Value))
             {
                 Console.WriteLine("An error occured while getting ChatGPT prompt: Prompt was null.");
+                return;
+            }
+
+            if(openAIService is null)
+            {
+                Console.WriteLine("An error occured while making the ChatGPT request: OpenAIService was null.");
                 return;
             }
 

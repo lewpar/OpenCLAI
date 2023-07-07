@@ -10,7 +10,8 @@ namespace OpenCLAI
         static OpenAIService? openAIService;
         static Dictionary<string, Func<string[], Task>> aiOptions = new Dictionary<string, Func<string[], Task>>()
         {
-            { "chatgpt",  HandleChatGPT }
+            { "chatgpt",  HandleChatGPT },
+            { "dalle", HandleDALLE }
         };
 
         static bool TryGetOption(string[] args, out string? option)
@@ -110,6 +111,48 @@ namespace OpenCLAI
             if(result.Status == OpenAIResultStatus.Failure)
             {
                 Console.WriteLine($"An error occured during the ChatGPT request: {result.Message}");
+                return;
+            }
+
+            Console.WriteLine(result.Message);
+        }
+
+        static async Task HandleDALLE(string[] args)
+        {
+            Argument? prompt = null;
+            if (!ArgumentParser.TryFind(args, "-prompt", out prompt) &&
+                !ArgumentParser.TryFind(args, "-p", out prompt))
+            {
+                Console.WriteLine("Prompt expected when using DALL-E option.");
+                Console.WriteLine("Example: openclai -dalle -prompt \"A white cat with blue eyes.\"");
+                return;
+            }
+
+            if (prompt is null ||
+                string.IsNullOrEmpty(prompt.Value))
+            {
+                Console.WriteLine("An error occured while getting DALL-E prompt: Prompt was null.");
+                return;
+            }
+
+            if (openAIService is null)
+            {
+                Console.WriteLine("An error occured while making the DALL-E request: OpenAIService was null.");
+                return;
+            }
+
+            Console.WriteLine("Fetching response..");
+            var result = await openAIService.GetImageAsync(prompt.Value);
+
+            if (result is null)
+            {
+                Console.WriteLine("An error occured while getting the DALL-E result: Result was null.");
+                return;
+            }
+
+            if (result.Status == OpenAIResultStatus.Failure)
+            {
+                Console.WriteLine($"An error occured during the DALL-E request: {result.Message}");
                 return;
             }
 

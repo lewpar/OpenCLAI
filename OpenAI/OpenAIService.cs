@@ -1,4 +1,5 @@
 ﻿using OpenCLAI.OpenAI.ChatGPT;
+using OpenCLAI.OpenAI.DALLE;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -76,6 +77,46 @@ namespace OpenCLAI.OpenAI
             var resultMessage = gptResponse.Choices[0].Message!.Content!;
 
             return new ChatGPTResult(OpenAIResultStatus.Success, gptResponse.Choices[0].Message!.Content!, gptResponse);
+        }
+
+        public async Task<DALLEResult> GetImageAsync(string prompt)
+        {
+            var request = new DALLE.Request()
+            {
+                Prompt = prompt,
+                Format = "url",
+                Count = 1,
+                Size = "256x256"
+            };
+
+            var json = JsonSerializer.Serialize(request);
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/images/generations");
+            httpRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.SendAsync(httpRequest);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new DALLEResult(OpenAIResultStatus.Failure, $"There was an issue with the response. Status: {response.StatusCode}");
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            var imageResponse = JsonSerializer.Deserialize<DALLE.Response>(content);
+
+            if (imageResponse == null || imageResponse.Data == null)
+            {
+                return new DALLEResult(OpenAIResultStatus.Failure, "There was no image data.");
+            }
+
+            var sb = new StringBuilder();
+            foreach (var image in imageResponse.Data)
+            {
+                sb.Append(image.Url);
+                sb.Append(";");
+            }
+
+            return new DALLEResult(OpenAIResultStatus.Success, sb.ToString(), imageResponse);
         }
     }
 }
